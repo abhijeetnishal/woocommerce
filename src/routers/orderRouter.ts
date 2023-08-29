@@ -7,8 +7,11 @@ import orderDetails from '../controllers/orderController';
 //It is used to define routes for a specific endpoint.
 const orderRouter = express.Router();
 
-//create an endpoint to get order details.
-orderRouter.get('/orders', orderDetails);
+//create an endpoint to get rest api order details.
+orderRouter.get('/rest-api/orders', orderDetails.restAPIOrderDetails);
+
+//create an endpoint to get graphql order details.
+orderRouter.get('/graphql/orders', orderDetails.graphQLOrderDetails);
 
 //export to router to use in other files (index.js file)
 export default orderRouter;

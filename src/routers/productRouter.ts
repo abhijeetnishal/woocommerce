@@ -7,8 +7,11 @@ import productDetails from '../controllers/productController';
 //It is used to define routes for a specific endpoint.
 const productRouter = express.Router();
 
-//create an endpoint to get product details.
-productRouter.get('/products', productDetails);
+//create an endpoint to get rest api product details.
+productRouter.get('/rest-api/products', productDetails.restAPIProductDetails);
+
+//create an endpoint to get graphql product details.
+productRouter.get('/graphql/products', productDetails.graphqlProductDetails);
 
 //export to router to use in other files (index.js file)
 export default productRouter;

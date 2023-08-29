@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import api from "../config/APIConfig";
+import api from "../config/restAPIConfig";
+import getData from "../config/graphQLConfig";
 
-const productDetails = async(req: Request, res: Response)=>{
+const restAPIProductDetails = async(req: Request, res: Response)=>{
     try{
         //get response
         const response = await api.get('products', {
@@ -21,4 +22,36 @@ const productDetails = async(req: Request, res: Response)=>{
     }
 }
 
-export default productDetails;
+const graphqlProductDetails = async(req: Request, res: Response)=>{
+    try{
+        //query
+        const query = `{
+            products(first: 100, sortKey: TITLE) {
+              edges {
+                node {
+                  id
+                  title
+                  description
+                  images(first: 2) {
+                    edges {
+                      node {
+                        originalSrc
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }`;
+        
+        //get products
+        const products = await getData(query);
+
+        res.status(200).json(products);
+    }
+    catch(error){
+        res.status(500).json('internal server error: ' + error);
+    }
+}
+
+export default { restAPIProductDetails, graphqlProductDetails };

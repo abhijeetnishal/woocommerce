@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import api from "../config/APIConfig";
+import api from "../config/restAPIConfig";
+import getData from "../config/graphQLConfig";
 
-const orderDetails = async(req: Request, res: Response)=>{
+const restAPIOrderDetails = async(req: Request, res: Response)=>{
     try{
         //get query params
         const page = req.query.page || 1;
@@ -31,4 +32,44 @@ const orderDetails = async(req: Request, res: Response)=>{
     }
 }
 
-export default orderDetails;
+const graphQLOrderDetails = async(req: Request, res: Response)=>{
+    try{
+        //get query params
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 5;
+
+        //filter orders between 12 DEC 2022 to 29 DEC 2022
+        const startDate = "2022-12-12";
+        const endDate = "2022-12-29";
+
+        //query
+        const query = `
+        {
+          orders(first: ${limit}, query: "created_at:>${startDate} created_at:<${endDate}", sortKey: CREATED_AT) {
+            edges {
+              node {
+                id
+                name
+                createdAt
+                totalPriceSet {
+                  presentmentMoney {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+        const orders = await getData(query);
+
+        res.status(200).json(orders);
+    }
+    catch(error){
+        res.status(500).json('internal server error: ' + error);
+    }
+}
+
+export default { restAPIOrderDetails, graphQLOrderDetails };
